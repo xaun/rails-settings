@@ -74,11 +74,13 @@ module RailsSettings
     end
 
     def _target_class
+      return if target_type.blank?
       target_type.constantize
     end
 
     def _setting?(method_name)
-      _target_class.default_settings[var.to_sym].keys.include?(method_name.to_s)
+      return false if _target_class.blank?
+      _target_class.default_settings[var.to_sym].key?(method_name.to_s)
     end
   end
 end
