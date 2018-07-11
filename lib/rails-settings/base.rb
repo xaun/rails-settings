@@ -8,6 +8,16 @@ module RailsSettings
                  :dependent  => :delete_all,
                  :class_name => self.setting_object_class_name
 
+        # Create setting objects from defaults.
+        # Rails-settings only creates/persists setting objects when selected values are saved (i.e not default).
+        # This change allows the settings classes to be registered as JSON API Resources, and for a
+        # list of setting objects (default or selected) to be returned in JSON to the front-end.
+        def init_default_settings!
+          self.class.default_settings.dup.each do |var, vals|
+            setting_objects.detect { |s| s.var == var.to_s } || setting_objects.create(var: var.to_s, value: vals, target: self)
+          end
+        end
+
         def settings(var)
           raise ArgumentError unless var.is_a?(Symbol)
           raise ArgumentError.new("Unknown key: #{var}") unless self.class.default_settings[var]

@@ -246,3 +246,18 @@ describe "to_settings_hash" do
     expect(user.to_settings_hash).to eq({:dashboard=>{"theme"=>"green", "view"=>"monthly", "filter"=>true, "sound" => 11}, :calendar=>{"scope"=>"some"}})
   end
 end
+
+describe "init_default_settings!" do
+  let(:user) { User.create }
+
+  it 'creates setting objects from defaults' do
+    expect { user.init_default_settings! }.to change { RailsSettings::SettingObject.count }.by(User.default_settings.count)
+  end
+
+  context 'when the setting object is already persisted' do
+    before { user.init_default_settings! }
+    it 'does not create duplicate records' do
+      expect { user.init_default_settings! }.to change { RailsSettings::SettingObject.count }.by(0)
+    end
+  end
+end
